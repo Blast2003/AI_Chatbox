@@ -3,13 +3,15 @@ import ImgTemp from "../assets/temp.jpeg"
 import MenuIcon from "../assets/menu.png"
 import SideBar from '../components/SideBar';
 import StarIcon from "../assets/star.png"
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import run from "../gemini"
 import { useDispatch, useSelector } from 'react-redux';
-import { addMsg, setNameChat } from '../store/chatSlice';
+import { addChat, addMsg, setNameChat } from '../store/chatSlice';
 
 const ChatDetail = () => {
+    const navigate = useNavigate();
     const [menuToggle, setMenuToggle] = useState(false);
+
     // save messages which has been declared in src/store/chatSlice/index.js
     const [dataDetail, setDataDetail] = useState([]);  
     const [messageDetail, setMessageDetail] = useState([]);
@@ -19,6 +21,10 @@ const ChatDetail = () => {
     const {data} = useSelector((state) => state.chat)
     const dispatch = useDispatch();
 
+    const handleNewChat = ()=>{
+        dispatch(addChat());
+    };
+    
     useEffect(()=>{
         if(data.length > 0){
             const chat = data.find((chat) => chat.id === id)
@@ -26,9 +32,10 @@ const ChatDetail = () => {
                 setDataDetail(chat)
                 setMessageDetail(chat.messages)
             }
-        }
+        } 
 
-    }, [data, id] )  // data change => run the method inside useEffect 
+    }, [data, id] )  // data or id change => run the method inside useEffect 
+
 
     const handleChatDetail = async () => {
         if(id){
@@ -116,10 +123,19 @@ const ChatDetail = () => {
                 </div>
             )}
 
-            <div className='flex items-center space-x-4'>
+            {id ? (<div className='flex items-center space-x-4'>
                 <input type='text' placeholder='Enter The Input Here' className='p-4 rounded-lg bg-primaryBg-default w-[90%] border' onChange={(e) => setInputChat(e.target.value)} value={inputChat}/>
                 <button className='p-4 rounded-lg bg-green-500' onClick={handleChatDetail}>Submit</button>
             </div>
+            
+            ) : (
+                
+                <div className='flex items-center space-x-4'>
+                <input type='text' placeholder='Enter The Input Here' className='p-4 rounded-lg bg-primaryBg-default w-[90%] border' onChange={(e) => setInputChat(e.target.value)} value={inputChat}/>
+                <button className='p-4 rounded-lg bg-green-500' onClick={handleNewChat}>Submit</button>
+                </div>
+            )}
+
 
         </div>
 
